@@ -167,6 +167,76 @@ export class MessageData {
     return chatMessageToObject(unlike);
   }
 
+  async addTag(
+    messageId: ObjectID,
+    userId: ObjectID,
+    tag: string,
+  ): Promise<ChatMessage> {
+    const filterBy = { _id: messageId };
+    const updateDocument = { $addToSet: { tags: tag } };
+
+    const updatedResult = await this.chatMessageModel.bulkWrite([
+      {
+        updateOne: {
+          filter: filterBy,
+          update: updateDocument,
+        },
+      },
+    ]);
+
+    if (!updatedResult || updatedResult.matchedCount === 0) {
+      throw new Error(
+        `Failed to add tag, messageId: ${messageId.toHexString()}, tag: ${tag}, userId: ${userId.toHexString()}`,
+      );
+    }
+
+    return this.getMessage(messageId.toHexString());
+  }
+
+  async updateTag(
+    messageId: ObjectID,
+    userId: ObjectID,
+    oldTag: string,
+    newTag: string,
+  ): Promise<ChatMessage> {
+    const filterBy = { _id: messageId, tags: oldTag };
+    const updateDocument = { $set: { 'tags.$': newTag } };
+
+    const updatedResult = await this.chatMessageModel.bulkWrite([
+      {
+        updateOne: {
+          filter: filterBy,
+          update: updateDocument,
+        },
+      },
+    ]);
+
+    if (!updatedResult || updatedResult.matchedCount === 0) {
+      throw new Error(
+        `Failed to update tag, messageId: ${messageId.toHexString()}, old tag: ${oldTag}, new tag: ${newTag} userId: ${userId.toHexString()}`,
+      );
+    }
+
+    return this.getMessage(messageId.toHexString());
+  }
+
+  async getMessagesByTag(
+    tag: string,
+    userId: ObjectID,
+  ): Promise<ChatMessage[]> {
+
+    const chatMessages = await this.chatMessageModel.find({
+      tags: { $in: [tag] },
+    });
+
+    if (!chatMessages || chatMessages.length === 0) {
+      throw new Error(
+        `Failed to find list of messages with tag: ${tag} userId: ${userId.toHexString()}`,
+      );
+    }
+    return chatMessages.map((chatMessage) => chatMessageToObject(chatMessage));
+  }
+
   async addReaction(
     reaction: string,
     userId: ObjectID,

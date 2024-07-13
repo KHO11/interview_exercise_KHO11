@@ -21,6 +21,8 @@ import {
   LikeMessageDto,
   ResolveMessageDto,
   ReactionDto,
+  AddTagDto,
+  UpdateTagDto,
 } from './models/message.dto';
 import { MessageLogic } from './message.logic';
 import {
@@ -139,6 +141,25 @@ export class MessageResolver {
     @AuthenticatedUser() authenticatedUser: IAuthenticatedUser,
   ): Promise<ChatMessage> {
     return await this.messageLogic.unlike(likeMessageDto, authenticatedUser);
+  }
+
+  @Mutation(() => ChatMessage)
+  async addTagToMessage(
+    @Args('addTagDto') addTagDto: AddTagDto,
+  ): Promise<ChatMessage> {
+    return this.messageLogic.addTagToMessage(addTagDto);
+  }
+
+  @Mutation(() => ChatMessage)
+  async updateTagToMessage(
+    @Args('updateTagDto') updateTagDto: UpdateTagDto,
+  ): Promise<ChatMessage> {
+    return this.messageLogic.updateTagToMessage(updateTagDto);
+  }
+
+  @Query(() => [ChatMessage])
+  async getMessagesByTag(@Args('tag') tag: string): Promise<ChatMessage[]> {
+    return this.messageLogic.getMessagesByTag(tag);
   }
 
   @Mutation(() => ChatMessage)
