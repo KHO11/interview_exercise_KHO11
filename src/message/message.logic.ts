@@ -13,6 +13,8 @@ import {
   ResolveMessageDto,
   ReactionDto,
   PollOptionDto,
+  AddTagDto,
+  UpdateTagDto,
 } from './models/message.dto';
 import { MessageData } from './message.data';
 import { IAuthenticatedUser } from '../authentication/jwt.strategy';
@@ -68,6 +70,15 @@ export interface IMessageLogic {
 
 @Injectable()
 export class MessageLogic implements IMessageLogic {
+  addTagToMessage(addTagDto: AddTagDto): ChatMessage | PromiseLike<ChatMessage> {
+    throw new Error('Method not implemented.');
+  }
+  updateTagToMessage(updateTagDto: UpdateTagDto): ChatMessage | PromiseLike<ChatMessage> {
+    throw new Error('Method not implemented.');
+  }
+  getMessagesByTag(tag: string): ChatMessage[] | PromiseLike<ChatMessage[]> {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @Inject(forwardRef(() => ConversationLogic))
     private conversationLogic: ConversationLogic,
